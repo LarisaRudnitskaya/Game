@@ -122,6 +122,8 @@
   }
 
   function drawWheel(rotation) {
+    if (logicalSize <= 0) return;
+
     const size = logicalSize;
     const center = size / 2;
     const radius = center - 10;
@@ -231,7 +233,7 @@
       resultCodeWrap.hidden = true;
     }
 
-    resultOverlay.hidden = false;
+    resultOverlay.removeAttribute('hidden');
     resultOverlay.setAttribute('aria-hidden', 'false');
     requestAnimationFrame(() => {
       resultOverlay.classList.add('is-visible');
@@ -239,18 +241,22 @@
   }
 
   function hideResult() {
+    if (!resultOverlay.classList.contains('is-visible')) return;
+
     resultOverlay.classList.remove('is-visible');
     resultOverlay.setAttribute('aria-hidden', 'true');
-    setTimeout(() => {
+
+    window.setTimeout(() => {
       if (!resultOverlay.classList.contains('is-visible')) {
-        resultOverlay.hidden = true;
+        resultOverlay.setAttribute('hidden', '');
       }
     }, 350);
   }
 
   function handleResize() {
     const wrapper = canvas.parentElement;
-    logicalSize = Math.min(wrapper.clientWidth, 460);
+    const measured = wrapper.clientWidth;
+    logicalSize = measured > 0 ? Math.min(measured, 460) : 460;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = logicalSize * dpr;
     canvas.height = logicalSize * dpr;
@@ -260,12 +266,28 @@
     drawWheel(currentRotation);
   }
 
-  spinBtn.addEventListener('click', spin);
-  closeBtn.addEventListener('click', hideResult);
-  closeBtnAlt.addEventListener('click', hideResult);
+  function initWheel() {
+    handleResize();
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => drawWheel(currentRotation));
+    }
+  }
 
-  resultOverlay.addEventListener('click', (e) => {
-    if (e.target === resultOverlay) hideResult();
+  spinBtn.addEventListener('click', spin);
+
+  [closeBtn, closeBtnAlt].forEach((button) => {
+    if (!button) return;
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      hideResult();
+    });
+  });
+
+  resultOverlay.addEventListener('click', (event) => {
+    if (event.target === resultOverlay) {
+      hideResult();
+    }
   });
 
   document.addEventListener('keydown', (e) => {
@@ -275,5 +297,13 @@
   });
 
   window.addEventListener('resize', handleResize);
-  handleResize();
+  window.addEventListener('load', initWheel);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(initWheel);
+  });
+
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => handleResize()).observe(wheelWrapper);
+  }
 })();
