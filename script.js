@@ -98,7 +98,6 @@
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const spinBtn = document.getElementById('spinBtn');
-  const retryBtn = document.getElementById('retryBtn');
   const closeBtn = document.getElementById('closeBtn');
   const closeBtnAlt = document.getElementById('closeBtnAlt');
   const resultOverlay = document.getElementById('resultOverlay');
@@ -262,10 +261,6 @@
   }
 
   spinBtn.addEventListener('click', spin);
-  retryBtn.addEventListener('click', () => {
-    hideResult();
-    setTimeout(spin, 400);
-  });
   closeBtn.addEventListener('click', hideResult);
   closeBtnAlt.addEventListener('click', hideResult);
 
