@@ -98,8 +98,6 @@
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const spinBtn = document.getElementById('spinBtn');
-  const closeBtn = document.getElementById('closeBtn');
-  const closeBtnAlt = document.getElementById('closeBtnAlt');
   const resultOverlay = document.getElementById('resultOverlay');
   const resultTitle = document.getElementById('resultTitle');
   const resultDesc = document.getElementById('resultDesc');
@@ -274,15 +272,6 @@
   }
 
   spinBtn.addEventListener('click', spin);
-
-  [closeBtn, closeBtnAlt].forEach((button) => {
-    if (!button) return;
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      hideResult();
-    });
-  });
 
   resultOverlay.addEventListener('click', (event) => {
     if (event.target === resultOverlay) {
